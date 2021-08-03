@@ -9,14 +9,16 @@
     },
     "license": "MIT",
     "dependencies": {
+        "@babel/core": "^7.14.8",
         "@fullcalendar/core": "^4.4.2",
         "@fullcalendar/daygrid": "4.0.1",
         "@fullcalendar/interaction": "4.0.2",
         "@fullcalendar/timegrid": "4.0.1",
+        "@typescript-eslint/eslint-plugin": "^4.29.0",
         "axios": "^0.21.1",
         "chart.js": "^3.5.0",
         "classnames": "^2.2.6",
-        "node-sass": "^4.12.0",
+        "node-sass": "^6.0.1",
         "primeflex": "^3.0.1",
         "primeicons": "^4.1.0",
         "primereact": "^6.5.0",
@@ -26,8 +28,10 @@
         "react-dom": "^17.0.1",
         "react-global-configuration": "^1.4.1",
         "react-router-dom": "^5.2.0",
-        "react-scripts": "4.0.0",
-        "react-transition-group": "^4.4.1"
+        "react-script": "^2.0.5",
+        "react-scripts": "^4.0.3",
+        "react-transition-group": "^4.4.1",
+        "typescript": "^2.9.2"
     },
     "main": "public/electron.js",
     "scripts": {

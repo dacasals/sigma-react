@@ -2,24 +2,6 @@ import axios from 'axios';
 
 export class ServicePathsService {
     
-
-    
-    // getServicePaths() {
-    //     let config = {
-    //         proxy: {
-    //             host: 'localhost',
-    //             port: 8000
-    //           },
-    //         headers: {'Access-Control-Allow-Origin': '*'}
-    //     };
-    //     axios.defaults.proxy = config.proxy;
-    //     return axios.get('/config/service_path').then(res => {
-    //         return res.data["services"]
-    //     });
-            
-    // }
-
-    
     _buildServiceFromNode(node) {
         let service = {}
         service["name"] = node.data.name;

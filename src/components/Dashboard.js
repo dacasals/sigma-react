@@ -29,7 +29,7 @@ const lineData = {
 export const Dashboard = () => {
 
     // const [events, setEvents] = useState(null);
-    const [endpoint_path, setEnpointPath] = useState(null);
+    const [endpoint_path, setEnpointPath] = useState(config.get("axios")["baseURL"]);
 
     useEffect(() => {
 
