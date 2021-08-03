@@ -123,7 +123,6 @@ export class ServicePathsService {
                 let service = spdata[index]
                 nodes_data.push(this._buildNodeFromService(index, service));
             }
-            console.log(nodes_data);
             return nodes_data; 
         });
     }
@@ -143,8 +142,9 @@ export class ServicePathsService {
                 let service = spdata[index]
                 nodes_data.push(this._buildNodeFromService(index, service));
             }
-            console.log(nodes_data);
             return nodes_data; 
+        }).catch(res => {
+            return null
         });
     }
 }

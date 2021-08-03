@@ -6,15 +6,16 @@ import { ServicePathsService } from '../../service/ServicePathsService';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import './TreeTableDemo.css';
-
-
+import { Toast } from 'primereact/toast';
 
 export class TreeTableSP extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            nodes: []
+            nodes: [],
+            loading: true,
+            
         };
         this.spService = new ServicePathsService();
         this.actionTemplate = this.actionTemplate.bind(this);
@@ -23,28 +24,44 @@ export class TreeTableSP extends Component {
         this.updateService = this.updateService.bind(this);
         this.deleteUrl = this.deleteUrl.bind(this);
         this.addUrl = this.addUrl.bind(this);
-
+        this.rowClassName = this.rowClassName.bind(this);
     }
 
     componentDidMount() {
+        this.spService.getServicePathsTree().then(data => this.setState({ nodes: data, loading: false }));
+    }
+    reloadPage = () => {
         this.spService.getServicePathsTree().then(data => this.setState({ nodes: data }));
     }
 
+    onServiceUpdated = (data) => {
+        this.toast.show({ severity: 'success', summary: 'Service update', detail: data.name, life: 3000 });
+    };
+    onServiceUpdatedFailed = (data) => {
+        this.toast.show({ severity: 'error', summary: 'Service update', detail: data.error, life: 3000 });
+    };
+    pathServiceDeleted = (data) => {
+        this.toast.show({ severity: 'error', summary: 'Pathd deleted', detail: data.message, life: 3000 });
+    };
+
     async updateService(node) {
-        console.log(node);
         let data = await this.spService.putServicePathTree(node);
         // let data = await this.spService.getServicePathsTree();
+        if (data === null){
+            this.onServiceUpdatedFailed({"error": "Service update failed."})
+        }
         this.setState({ nodes: data })
+        this.onServiceUpdated({"name": "Service updated."});
     }
 
     deleteUrl(node) {
-        console.log(node);
         let newNodes = JSON.parse(JSON.stringify(this.state.nodes));
         this.deleteNodeByKey(newNodes, node.key);
 
         this.setState({
             nodes: newNodes
         });
+        this.pathServiceDeleted({"message": "Route deleted in local."})
     }
 
     addUrl(node) {
@@ -86,7 +103,7 @@ export class TreeTableSP extends Component {
         let newNodes = JSON.parse(JSON.stringify(this.state.nodes));
         let editedNode = this.findNodeByKey(newNodes, props.node.key);
         editedNode.data[props.field] = value;
-
+        editedNode.data["changed"] = true;
         this.setState({
             nodes: newNodes
         });
@@ -98,10 +115,10 @@ export class TreeTableSP extends Component {
 
         while (path.length) {
             let list = node ? node.children : nodes;
-            if (path.length == 1) {
+            if (path.length === 1) {
                 for (let i = 0; i < list.length; i++) {
                     const element = list[i];
-                    if (element.key == key){
+                    if (element.key === key){
                         return element;
                     }
                 }
@@ -121,12 +138,12 @@ export class TreeTableSP extends Component {
             let list = node ? node.children : nodes;
             if(path.length === 1) {
                 list.splice(parseInt(path[0], 10), 1)
+                node.data["changed"] = true;
                 break;
             }
             node = list[parseInt(path[0], 10)];
             path.shift();
         }
-        console.log(nodes);
     }
 
 
@@ -155,23 +172,37 @@ export class TreeTableSP extends Component {
     }
 
     urlEditor(props) {
-        console.log(props)
         return this.inputTextEditor(props, 'url');
     }
 
     weightEditor(props) {
-        console.log(props)
         return this.inputNumberEditor(props, 'weight');
+    }
+
+    rowClassName(node) {
+
+        
+        let resp = {
+            'row-modified': node.data["changed"] === true
+        }
+        return resp;
     }
 
     render() {
         const header = "Service Paths";
-        const footer = <div style={{ textAlign: 'left' }}><Button icon="pi pi-refresh" tooltip="Reload" /></div>;
+        const footer = <div style={{ textAlign: 'left' }}><Button icon="pi pi-refresh" onClick={this.reloadPage} tooltip="Reload" /></div>;
 
         return (
             <div>
+                <Toast ref={(el) => this.toast = el}></Toast>
                 <div className="card">
-                    <TreeTable value={this.state.nodes} header={header} footer={footer}>
+                    <TreeTable
+                        value={this.state.nodes}
+                        header={header}
+                        footer={footer}
+                        rowClassName={this.rowClassName}
+                        loading={this.state.loading}
+                    >
                         <Column field="name" header="Name" expander style={{width:'25%'}}></Column>
                         <Column field="url" header="Url Model" editor={this.urlEditor} style={{width:'45%'}}></Column>
                         <Column field="weight" header="Weight"  editor={this.weightEditor} style={{width:'10%'}}></Column>

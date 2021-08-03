@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Route, useHistory } from 'react-router-dom';
-import { CSSTransition } from 'react-transition-group';
-
 import { AppTopbar } from './AppTopbar';
 import { AppFooter } from './AppFooter';
 import { AppMenu } from './AppMenu';
@@ -11,36 +9,35 @@ import { AppConfig } from './AppConfig';
 import { ServicePaths } from './components/api/ServicePaths';
 
 import { Dashboard } from './components/Dashboard';
-import { ButtonDemo } from './components/ButtonDemo';
-// import { ChartDemo } from './components/ChartDemo';
-import { Documentation } from './components/Documentation';
-import { FileDemo } from './components/FileDemo';
-import { FloatLabelDemo } from './components/FloatLabelDemo';
-import { FormLayoutDemo } from './components/FormLayoutDemo';
-import { InputDemo } from './components/InputDemo';
-import { ListDemo } from './components/ListDemo';
-import { MenuDemo } from './components/MenuDemo';
-import { MessagesDemo } from './components/MessagesDemo';
-import { MiscDemo } from './components/MiscDemo';
-import { OverlayDemo } from './components/OverlayDemo';
-import { PanelDemo } from './components/PanelDemo';
-import { TableDemo } from './components/TableDemo';
-import { TreeDemo } from './components/TreeDemo';
-import { InvalidStateDemo } from './components/InvalidStateDemo';
+// import { ButtonDemo } from './components/ButtonDemo';
+// import { Documentation } from './components/Documentation';
+// import { FileDemo } from './components/FileDemo';
+// import { FloatLabelDemo } from './components/FloatLabelDemo';
+// import { FormLayoutDemo } from './components/FormLayoutDemo';
+// import { InputDemo } from './components/InputDemo';
+// import { ListDemo } from './components/ListDemo';
+// import { MenuDemo } from './components/MenuDemo';
+// import { MessagesDemo } from './components/MessagesDemo';
+// import { MiscDemo } from './components/MiscDemo';
+// import { OverlayDemo } from './components/OverlayDemo';
+// import { PanelDemo } from './components/PanelDemo';
+// import { TableDemo } from './components/TableDemo';
+// import { TreeDemo } from './components/TreeDemo';
+// import { InvalidStateDemo } from './components/InvalidStateDemo';
 
-import { Calendar } from './pages/Calendar';
-import { Crud } from './pages/Crud';
-import { EmptyPage } from './pages/EmptyPage';
+// import { Calendar } from './pages/Calendar';
+// import { Crud } from './pages/Crud';
+// import { EmptyPage } from './pages/EmptyPage';
 
-import { DisplayDemo } from './utilities/DisplayDemo';
-import { ElevationDemo } from './utilities/ElevationDemo';
-import { FlexBoxDemo } from './utilities/FlexBoxDemo';
-import { GridDemo } from './utilities/GridDemo';
-import { IconsDemo } from './utilities/IconsDemo';
-import { SpacingDemo } from './utilities/SpacingDemo';
-import { TextDemo } from './utilities/TextDemo';
-import { TypographyDemo } from './utilities/TypographyDemo';
-import { TimelineDemo } from './utilities/TimelineDemo';
+// import { DisplayDemo } from './utilities/DisplayDemo';
+// import { ElevationDemo } from './utilities/ElevationDemo';
+// import { FlexBoxDemo } from './utilities/FlexBoxDemo';
+// import { GridDemo } from './utilities/GridDemo';
+// import { IconsDemo } from './utilities/IconsDemo';
+// import { SpacingDemo } from './utilities/SpacingDemo';
+// import { TextDemo } from './utilities/TextDemo';
+// import { TypographyDemo } from './utilities/TypographyDemo';
+// import { TimelineDemo } from './utilities/TimelineDemo';
 
 import PrimeReact from 'primereact/api';
 
@@ -55,6 +52,23 @@ import '@fullcalendar/timegrid/main.css';
 import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
+import { Sidebar } from 'primereact/sidebar';
+import config from 'react-global-configuration';
+import axios from 'axios';
+import { ServiceLoggingConfig } from './components/api/ServiceLoggingConfig';
+
+config.set({ "axios": {"baseURL": 'http://localhost:8000'  }},  { freeze: false});
+
+
+axios.interceptors.request.use(function (config_axios) {
+    // Do something before request is sent
+    console.log(config.get("axios"))
+    config_axios.baseURL = config.get("axios").baseURL;
+    return config_axios;
+  }, function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  });
 
 const App = () => {
 
@@ -63,7 +77,6 @@ const App = () => {
     const [inputStyle, setInputStyle] = useState('outlined');
     const [ripple, setRipple] = useState(false);
     const [sidebarActive, setSidebarActive] = useState(true);
-    const sidebar = useRef();
     const history = useHistory();
 
     let menuClick = false;
@@ -108,9 +121,9 @@ const App = () => {
         event.preventDefault();
     }
 
-    const onSidebarClick = () => {
-        menuClick = true;
-    }
+    // const onSidebarClick = () => {
+    //     menuClick = true;
+    // }
 
     const onMenuItemClick = (event) => {
         if (!event.item.items && layoutMode === "overlay") {
@@ -124,6 +137,8 @@ const App = () => {
             label: 'Configuration', icon: 'pi pi-fw pi-sitemap',
             items: [
                 { label: 'ML model Paths', icon: 'pi pi-fw pi-id-card', to: '/servicepaths' },
+                { label: 'Logging config', icon: 'pi pi-fw pi-id-card', to: '/logging_config' },
+
                 // { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/input' },
             ]
         },
@@ -232,9 +247,9 @@ const App = () => {
             element.className = element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
     }
 
-    const isSidebarVisible = () => {
-        return sidebarActive;
-    };
+    // const isSidebarVisible = () => {
+    //     return sidebarActive;
+    // };
 
     const logo = layoutColorMode === 'dark' ? 'assets/layout/images/logo-white.svg' : 'assets/layout/images/logo.svg';
 
@@ -253,25 +268,34 @@ const App = () => {
 
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
-            <AppTopbar onToggleMenu={onToggleMenu} />
-
-            <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
-                <div ref={sidebar} className={sidebarClassName} onClick={onSidebarClick}>
-                    <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.push('/')}>
+            
+            <Sidebar visible={sidebarActive} onHide={() => setSidebarActive(false)}
+            className={sidebarClassName}
+            >
+                <div className="layout-logo" style={{cursor: 'pointer'}} onClick={() => history.push('/')}>
                         <img alt="Logo" src={logo} />
-                    </div>
-                    <AppProfile />
-                    <AppMenu model={menu} onMenuItemClick={onMenuItemClick} />
                 </div>
-            </CSSTransition>
-
-            <AppConfig rippleEffect={ripple} onRippleEffect={onRipple} inputStyle={inputStyle} onInputStyleChange={onInputStyleChange}
-                layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
+                <AppProfile />
+                <AppMenu model={menu} onMenuItemClick={onMenuItemClick} />
+            </Sidebar>
+            <AppTopbar onToggleMenu={onToggleMenu} />
+            <AppConfig
+                rippleEffect={ripple}
+                onRippleEffect={onRipple}
+                inputStyle={inputStyle} 
+                onInputStyleChange={onInputStyleChange}
+                layoutMode={layoutMode} 
+                onLayoutModeChange={onLayoutModeChange} 
+                layoutColorMode={layoutColorMode} 
+                onColorModeChange={onColorModeChange} 
+            />
 
             <div className="layout-main">
                 <Route path="/" exact component={Dashboard} />
                 <Route path="/servicepaths" component={ServicePaths} />
-                <Route path="/formlayout" component={FormLayoutDemo} />
+                <Route path="/logging_config" component={ServiceLoggingConfig} />
+
+                {/* <Route path="/formlayout" component={FormLayoutDemo} />
                 <Route path="/input" component={InputDemo} />
                 <Route path="/floatlabel" component={FloatLabelDemo} />
                 <Route path="/invalidstate" component={InvalidStateDemo} />
@@ -284,7 +308,7 @@ const App = () => {
                 <Route path="/menu" component={MenuDemo} />
                 <Route path="/messages" component={MessagesDemo} />
                 <Route path="/file" component={FileDemo} />
-                {/* <Route path="/chart" component={ChartDemo} /> */}
+                <Route path="/chart" component={ChartDemo} />
                 <Route path="/misc" component={MiscDemo} />
                 <Route path="/display" component={DisplayDemo} />
                 <Route path="/elevation" component={ElevationDemo} />
@@ -298,11 +322,9 @@ const App = () => {
                 <Route path="/timeline" component={TimelineDemo} />
                 <Route path="/crud" component={Crud} />
                 <Route path="/empty" component={EmptyPage} />
-                <Route path="/documentation" component={Documentation} />
+                <Route path="/documentation" component={Documentation} /> */}
             </div>
-
             <AppFooter />
-
         </div>
     );
 

@@ -4,3 +4,7 @@
     padding-top: 0;
     padding-bottom: 0;
 }
+
+.row-modified {
+    background-color: rgba(173, 125, 125, 0.15) !important;
+}
